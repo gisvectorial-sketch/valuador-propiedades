@@ -3,543 +3,584 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Seguimiento de Obra — Arq. Alvaro Chapa Villarreal</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Valuador de Propiedades — Arq. Alvaro Chapa Villarreal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-:root{--bg:#F5F4F0;--surface:#FFF;--border:#E2E0D8;--border2:#CECCC2;--text1:#1A1916;--text2:#5A5850;--text3:#9A9890;--accent:#1F3864;--accent2:#2E5599;--success:#2A7A4B;--suc-bg:#EAF4EE;--warn:#854F0B;--warn-bg:#FDF3E3;--danger:#A32D2D;--dan-bg:#FCEBEB;--radius:12px;--radius-sm:8px;--shadow:0 2px 12px rgba(0,0,0,0.06);}
+:root{
+  --bg:#F5F4F0;--surface:#FFF;--border:#E2E0D8;--border2:#CECCC2;
+  --text1:#1A1916;--text2:#5A5850;--text3:#9A9890;
+  --accent:#1F3864;--accent2:#2E5599;--accent3:#4A78CC;
+  --success:#2A7A4B;--suc-bg:#EAF4EE;
+  --warn:#854F0B;--warn-bg:#FDF3E3;
+  --danger:#A32D2D;--dan-bg:#FCEBEB;
+  --info-bg:#EEF3FB;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 2px 12px rgba(0,0,0,0.06);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh;padding-bottom:40px;}
-.app-header{background:var(--accent);padding:16px 18px 12px;position:sticky;top:0;z-index:100;}
-.header-inner{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:11px;}
-.avatar{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.22);}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh;padding-bottom:48px;}
+.app-header{background:var(--accent);padding:18px 20px 14px;position:sticky;top:0;z-index:100;}
+.header-inner{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+.avatar{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;color:#fff;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.22);}
 .header-name{font-size:14px;font-weight:600;color:#fff;line-height:1.2;}
-.header-sub{font-size:11px;color:rgba(255,255,255,0.65);margin-top:1px;}
-.header-badge{margin-left:auto;font-size:10px;font-weight:500;background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.85);padding:3px 10px;border-radius:20px;white-space:nowrap;cursor:pointer;}
+.header-sub{font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px;}
+.header-badge{margin-left:auto;font-size:10px;font-weight:500;background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.85);padding:3px 10px;border-radius:20px;white-space:nowrap;}
 .main{max-width:640px;margin:0 auto;padding:14px 13px 0;}
 .card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:11px;box-shadow:var(--shadow);overflow:hidden;}
 .card-head{padding:11px 15px 0;font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);}
 .card-body{padding:11px 15px 15px;}
-.login-wrap{max-width:400px;margin:60px auto 0;padding:0 16px;}
-.login-title{font-size:20px;font-weight:600;color:var(--accent);margin-bottom:6px;}
-.login-sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
-.field{margin-bottom:12px;}.field:last-child{margin-bottom:0;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.field{margin-bottom:11px;}.field:last-child{margin-bottom:0;}
 label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500;}
-input[type=text],input[type=password],input[type=email],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text1);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;}
-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A5850' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
-textarea{resize:vertical;min-height:80px;}
-.btn{border:none;border-radius:var(--radius-sm);padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
-.btn-primary{background:var(--accent);color:#fff;width:100%;padding:12px;display:block;}
-.btn-success{background:var(--success);color:#fff;}
-.btn-outline{background:none;border:1px solid var(--border2);color:var(--text2);}
-.btn-sm{font-size:12px;padding:6px 12px;}
+select,input[type=number]{width:100%;padding:9px 11px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text1);font-family:'DM Sans',sans-serif;font-size:13px;appearance:none;-webkit-appearance:none;outline:none;transition:border-color 0.15s;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A5850' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
+select:focus,input[type=number]:focus{border-color:var(--accent3);}
 .tabs{display:flex;gap:5px;padding:11px 15px 0;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{font-size:12px;font-weight:500;padding:5px 13px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;white-space:nowrap;color:var(--text2);background:var(--surface);flex-shrink:0;}
+.tab{font-size:12px;font-weight:500;padding:5px 13px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;white-space:nowrap;color:var(--text2);background:var(--surface);transition:all 0.15s;flex-shrink:0;}
 .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .panel{display:none;}.panel.active{display:block;}
-.proy-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:9px;cursor:pointer;box-shadow:var(--shadow);}
-.proy-nombre{font-size:14px;font-weight:600;margin-bottom:3px;}
-.proy-meta{font-size:12px;color:var(--text2);margin-bottom:8px;}
-.prog-track{height:7px;background:var(--bg);border-radius:4px;border:1px solid var(--border);overflow:hidden;}
-.prog-fill{height:100%;border-radius:4px;background:var(--success);}
-.proy-footer{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:6px;}
-.etapa-row{padding:10px 0;border-bottom:1px solid var(--border);}
-.etapa-row:last-child{border-bottom:none;}
-.etapa-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-.etapa-name{font-size:13px;font-weight:500;}
-.etapa-pct{font-size:13px;font-weight:600;}
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px;}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
 .metric{background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);padding:10px 12px;}
-.metric-lbl{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;text-transform:uppercase;}
-.metric-val{font-size:17px;font-weight:600;}
-.bit-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:9px;}
-.bit-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.bit-badge{font-size:10px;padding:2px 9px;border-radius:var(--radius-sm);font-weight:500;background:var(--suc-bg);color:var(--success);}
-.bit-fecha{font-size:11px;color:var(--text3);}
-.bit-texto{font-size:13px;line-height:1.5;margin-bottom:6px;}
-.bit-img{width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius-sm);margin-top:8px;border:1px solid var(--border);}
-.alerta-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.5;}
-.alerta-item:last-child{border-bottom:none;}
-.alerta-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
-.range-wrap{display:flex;align-items:center;gap:10px;}
-.range-wrap input[type=range]{flex:1;accent-color:var(--accent);}
-.range-val{font-size:14px;font-weight:600;color:var(--accent);min-width:38px;text-align:right;}
-.foto-preview{width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius-sm);margin-top:6px;border:1px solid var(--border);}
-.badge{font-size:10px;padding:2px 9px;border-radius:var(--radius-sm);font-weight:500;}
-.badge-en{background:var(--suc-bg);color:var(--success);}
-.empty{text-align:center;padding:30px 0;color:var(--text3);font-size:13px;}
-.loading{text-align:center;padding:20px;color:var(--text3);font-size:12px;}
-.divider{height:1px;background:var(--border);margin:12px 0;}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.metric-lbl{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
+.metric-val{font-size:16px;font-weight:600;color:var(--text1);}
+.total-box{background:var(--info-bg);border:1.5px solid var(--accent2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.total-lbl{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
+.total-val{font-size:22px;font-weight:700;color:var(--accent);font-family:'DM Serif Display',serif;}
+.rango-wrap{margin:8px 0 10px;}
+.rango-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px;}
+.rango-track{height:8px;background:var(--bg);border-radius:4px;border:1px solid var(--border);position:relative;}
+.rango-fill{position:absolute;inset:0;border-radius:4px;background:var(--info-bg);border:1px solid var(--accent2);}
+.rango-needle{position:absolute;top:-5px;width:3px;height:18px;background:var(--accent);border-radius:2px;transform:translateX(-50%);transition:left 0.3s;}
+.desglose-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.desglose-row:last-child{border-bottom:none;}
+.desglose-lbl{color:var(--text2);}
+.desglose-val{font-weight:600;color:var(--text1);}
+.desglose-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.badge{font-size:11px;padding:2px 9px;border-radius:var(--radius-sm);font-weight:500;}
+.badge-pos{background:var(--suc-bg);color:var(--success);}
+.badge-neg{background:var(--dan-bg);color:var(--danger);}
+.badge-neu{background:var(--bg);color:var(--text2);border:1px solid var(--border);}
+.badge-warn{background:var(--warn-bg);color:var(--warn);}
+.risk-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.5;}
+.risk-row:last-child{border-bottom:none;}
+.risk-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
 .note{font-size:11px;color:var(--text3);line-height:1.6;}
-.app-footer{text-align:center;font-size:11px;color:var(--text3);margin-top:16px;}
+.dep-bar{margin:6px 0 10px;}
+.dep-track{height:10px;background:var(--bg);border-radius:5px;border:1px solid var(--border);overflow:hidden;}
+.dep-fill{height:100%;border-radius:5px;transition:width 0.4s;}
+.admin-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin:14px 0 8px;}
+.admin-title:first-child{margin-top:0;}
+.admin-table{width:100%;border-collapse:collapse;}
+.admin-table th{font-size:10px;color:var(--text3);font-weight:600;text-align:left;padding:5px 4px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.05em;}
+.admin-table td{padding:5px 4px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:12px;color:var(--text1);}
+.admin-table input[type=number]{width:85px;font-size:12px;padding:4px 7px;}
+.save-badge{font-size:11px;padding:4px 12px;border-radius:16px;background:var(--suc-bg);color:var(--success);display:none;font-weight:500;}
+.btn-save{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-reset{background:none;border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;}
+.btn-actions{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+.btn-pdf{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity 0.15s;margin-top:4px;box-shadow:0 4px 14px rgba(31,56,100,0.22);}
+.btn-pdf:active{opacity:0.85;}
+.app-footer{text-align:center;font-size:11px;color:var(--text3);margin-top:18px;padding:0 13px;}
 @media(max-width:380px){.row2{grid-template-columns:1fr;}.metrics{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<div id="screen-login">
-  <header class="app-header"><div class="header-inner"><div class="avatar">AC</div><div><div class="header-name">Arq. Alvaro Chapa Villarreal</div><div class="header-sub">Seguimiento de obra digital</div></div></div></header>
-  <div class="login-wrap">
-    <div class="login-title">Bienvenido</div>
-    <div class="login-sub">Ingresa con tu correo y contrasena</div>
-    <div class="field"><label>Correo</label><input type="email" id="login-email" placeholder="correo@ejemplo.com"></div>
-    <div class="field"><label>Contrasena</label><input type="password" id="login-pass" placeholder=""></div>
-    <div style="margin-top:16px;"><button class="btn btn-primary" id="btn-login">Entrar</button></div>
-    <p id="login-error" style="color:var(--danger);font-size:12px;margin-top:10px;display:none;"></p>
-    <p class="note" style="margin-top:16px;text-align:center;">Cliente: usa el correo y contrasena que te dio el despacho.</p>
+<header class="app-header">
+  <div class="header-inner">
+    <div class="avatar">AC</div>
+    <div>
+      <div class="header-name">Arq. Alvaro Chapa Villarreal</div>
+      <div class="header-sub">📱 WhatsApp 81 2289 4100</div>
+    </div>
+    <div class="header-badge">AMM 2025</div>
+  </div>
+</header>
+
+<main class="main">
+
+<div class="card">
+  <div class="card-head">Valuador paramétrico de propiedades existentes — AMM NL</div>
+  <div class="card-body">
+
+    <div class="row2">
+      <div class="field">
+        <label>Tipo de propiedad</label>
+        <select id="tipo">
+          <option value="casa_sola">Casa sola</option>
+          <option value="depto">Departamento</option>
+          <option value="oficina">Oficina / consultorio</option>
+          <option value="local">Local comercial</option>
+          <option value="bodega">Bodega / nave</option>
+          <option value="edificio">Edificio habitacional</option>
+          <option value="plaza">Local en plaza</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Municipio</label>
+        <select id="municipio">
+          <option value="sanpedro">San Pedro Garza García</option>
+          <option value="monterrey_nte">Monterrey Norte</option>
+          <option value="monterrey_ctr">Monterrey Centro</option>
+          <option value="monterrey_sur">Monterrey Sur</option>
+          <option value="sannicolas">San Nicolás de los Garza</option>
+          <option value="guadalupe">Guadalupe</option>
+          <option value="escobedo" selected>Escobedo / García</option>
+          <option value="apodaca">Apodaca</option>
+          <option value="juarez">Juárez</option>
+          <option value="santacatarina">Santa Catarina</option>
+          <option value="cienega">Ciénega de Flores</option>
+          <option value="salinas">Salinas Victoria</option>
+          <option value="cadereyta">Cadereyta Jiménez</option>
+          <option value="allende">Allende</option>
+          <option value="pesqueria">Pesquería</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Superficie construida (m²)</label>
+        <input type="number" id="sup_const" value="120" min="10" max="50000" step="5">
+      </div>
+      <div class="field">
+        <label>Superficie de terreno (m²)</label>
+        <input type="number" id="sup_terr" value="200" min="0" max="100000" step="5">
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Niveles</label>
+        <select id="niveles">
+          <option value="1" selected>1 nivel</option>
+          <option value="2">2 niveles</option>
+          <option value="3">3 niveles</option>
+          <option value="4">4+ niveles</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Edad de la construcción</label>
+        <select id="edad">
+          <option value="0">0–5 años (nueva)</option>
+          <option value="1">6–10 años</option>
+          <option value="2" selected>11–20 años</option>
+          <option value="3">21–30 años</option>
+          <option value="4">31–40 años</option>
+          <option value="5">41–50 años</option>
+          <option value="6">Más de 50 años</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Calidad de acabados</label>
+        <select id="acabados">
+          <option value="economico">Económicos</option>
+          <option value="estandar" selected>Estándar</option>
+          <option value="premium">Premium</option>
+          <option value="lujo">Lujo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Estado de conservación</label>
+        <select id="conservacion">
+          <option value="excelente">Excelente</option>
+          <option value="bueno" selected>Bueno</option>
+          <option value="regular">Regular</option>
+          <option value="malo">Malo / deteriorado</option>
+          <option value="ruina">En ruina</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Zona dentro del municipio</label>
+        <select id="zona">
+          <option value="1.15">Zona alta / premium</option>
+          <option value="1.00" selected>Zona media</option>
+          <option value="0.82">Zona popular</option>
+          <option value="0.65">Zona de interés social</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Estacionamientos</label>
+        <select id="cajones">
+          <option value="0">Sin cajones</option>
+          <option value="1" selected>1 cajón</option>
+          <option value="2">2 cajones</option>
+          <option value="3">3+ cajones</option>
+        </select>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<div id="screen-residente" style="display:none;">
-  <header class="app-header"><div class="header-inner"><div class="avatar">AC</div><div><div class="header-name">Arq. Alvaro Chapa Villarreal</div><div class="header-sub">Residente de obra</div></div><div class="header-badge" id="btn-salir">Salir</div></div></header>
-  <div class="main">
-    <div id="res-lista">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:13px;font-weight:500;color:var(--text2);">Mis proyectos</span><button class="btn btn-success btn-sm" id="btn-nuevo-proy">+ Nuevo</button></div>
-      <div id="res-proyectos"><div class="loading">Cargando...</div></div>
+<div class="card">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('resultado',this)">Resultado</div>
+    <div class="tab" onclick="showTab('desglose',this)">Desglose</div>
+    <div class="tab" onclick="showTab('depreciacion',this)">Depreciación</div>
+    <div class="tab" onclick="showTab('alertas',this)">Alertas</div>
+    <div class="tab" onclick="showTab('admin',this)">⚙ Editar</div>
+  </div>
+
+  <div id="panel-resultado" class="panel active card-body">
+    <div class="metrics">
+      <div class="metric"><div class="metric-lbl">Valor construcción</div><div class="metric-val" id="r-const">$0</div></div>
+      <div class="metric"><div class="metric-lbl">Valor terreno</div><div class="metric-val" id="r-terr">$0</div></div>
+      <div class="metric"><div class="metric-lbl">Depreciación</div><div class="metric-val" id="r-dep">0%</div></div>
+      <div class="metric"><div class="metric-lbl">Valor / m² total</div><div class="metric-val" id="r-xm2">$0</div></div>
     </div>
-    <div id="res-form-nuevo" style="display:none;">
-      <div class="card"><div class="card-head">Nuevo proyecto</div><div class="card-body">
-        <div class="field"><label>Nombre del proyecto</label><input type="text" id="np-nombre" placeholder="Casa Familia Martinez"></div>
-        <div class="field"><label>Cliente</label><input type="text" id="np-cliente" placeholder="Familia Martinez"></div>
-        <div class="field"><label>Correo del cliente</label><input type="email" id="np-email" placeholder="cliente@correo.com"></div>
-        <div class="field"><label>Contrasena para el cliente</label><input type="text" id="np-pass" value="obra2025"></div>
-        <div class="row2">
-          <div class="field"><label>Fecha inicio</label><input type="text" id="np-inicio" placeholder="01 Mar 2025"></div>
-          <div class="field"><label>Entrega estimada</label><input type="text" id="np-fin" placeholder="30 Jun 2025"></div>
-        </div>
-        <div class="field"><label>Tipo</label><select id="np-tipo"><option>Casa habitacion</option><option>Departamento</option><option>Oficinas</option><option>Local comercial</option><option>Bodega / nave</option><option>Remodelacion</option></select></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-          <button class="btn btn-outline" id="btn-cancel-nuevo">Cancelar</button>
-          <button class="btn btn-success" id="btn-crear-proy" style="width:auto;">Crear proyecto</button>
-        </div>
-        <p id="np-msg" style="font-size:12px;margin-top:8px;display:none;color:var(--text2);"></p>
-      </div></div>
+    <div class="total-box">
+      <div>
+        <div class="total-lbl">Valor total estimado</div>
+        <div class="total-val" id="r-total">$0</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:10px;color:var(--accent);font-weight:600;">MXN</div>
+        <div style="font-size:10px;color:var(--accent);opacity:0.7;">Sin IVA</div>
+      </div>
     </div>
-    <div id="res-detalle" style="display:none;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <button class="btn btn-outline btn-sm" id="btn-volver">Proyectos</button>
-        <span id="res-det-nombre" style="font-size:14px;font-weight:600;"></span>
-      </div>
-      <div class="card">
-        <div class="tabs">
-          <div class="tab active" data-tab="avance">Avance</div>
-          <div class="tab" data-tab="reporte">+ Reporte</div>
-          <div class="tab" data-tab="bitacora">Bitacora</div>
-          <div class="tab" data-tab="alertas">Alertas</div>
-        </div>
-        <div id="res-tab-avance" class="panel active card-body">
-          <div class="metrics">
-            <div class="metric"><div class="metric-lbl">Avance general</div><div class="metric-val" id="res-avance-pct">0%</div></div>
-            <div class="metric"><div class="metric-lbl">Ultimo reporte</div><div class="metric-val" id="res-ultimo" style="font-size:13px;">-</div></div>
-          </div>
-          <div id="res-etapas"></div>
-        </div>
-        <div id="res-tab-reporte" class="panel card-body">
-          <div class="field"><label>Etapa</label><select id="rep-etapa"><option>Cimentacion y estructura</option><option>Albanileria y muros</option><option>Instalaciones</option><option>Acabados interiores</option><option>Fachada y exteriores</option><option>Limpieza y entrega</option></select></div>
-          <div class="field"><label>% de avance</label><div class="range-wrap"><input type="range" min="0" max="100" step="5" value="50" id="rep-pct"><span class="range-val" id="rep-pct-val">50%</span></div></div>
-          <div class="field"><label>Nota</label><textarea id="rep-nota" placeholder="Describe el avance..."></textarea></div>
-          <div class="field"><label>Estado</label><select id="rep-estado"><option value="tiempo">En tiempo</option><option value="retraso_menor">Retraso menor</option><option value="retraso">Retraso significativo</option><option value="adelanto">Adelantado</option></select></div>
-                    <div class="field"><label>Foto de avance (opcional)</label><input type="file" id="rep-foto" accept="image/*" capture="environment"><img id="rep-foto-prev" class="foto-preview" style="display:none;"></div>
-          <button class="btn btn-primary" id="btn-pub-reporte" style="margin-top:8px;">Publicar reporte</button>
-          <p id="rep-msg" style="font-size:12px;margin-top:8px;display:none;"></p>
-        </div>
-        <div id="res-tab-bitacora" class="panel card-body"><div id="res-bitacora"><div class="loading">Cargando...</div></div></div>
-        <div id="res-tab-alertas" class="panel card-body">
-          <div class="field"><label>Nueva alerta</label><textarea id="alerta-texto" placeholder="Describe la alerta..."></textarea></div>
-          <div class="field"><label>Tipo</label><select id="alerta-tipo"><option value="warn">Advertencia</option><option value="ok">Completado</option><option value="danger">Problema critico</option><option value="info">Informacion</option></select></div>
-          <button class="btn btn-success btn-sm" id="btn-add-alerta">Agregar</button>
-          <div class="divider"></div>
-          <div id="res-alertas"><div class="loading">Cargando...</div></div>
-        </div>
-      </div>
-      <button id="btn-pdf-reporte" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:11px;box-shadow:0 4px 14px rgba(31,56,100,0.22);">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="white" stroke-width="1.2" fill="none"/><path d="M10 2v4h4M5 9h6M5 11.5h4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Exportar reporte PDF
-      </button>
-      <div class="app-footer">Arq. Alvaro Chapa · 81 2289 4100 · Seguimiento de obra NL 2025</div>
+    <div class="rango-wrap">
+      <div class="rango-labels"><span id="r-lo">—</span><span style="font-size:11px;font-weight:500;color:var(--text2);">Rango de mercado</span><span id="r-hi">—</span></div>
+      <div class="rango-track"><div class="rango-fill"></div><div class="rango-needle" id="rneedle"></div></div>
+    </div>
+    <p class="note" id="r-nota"></p>
+  </div>
+
+  <div id="panel-desglose" class="panel card-body">
+    <div id="lista-desglose"></div>
+    <p class="note" style="margin-top:10px;">Método paramétrico: valor repuesto nuevo × depreciación + valor de terreno. Precios MXN sin IVA.</p>
+  </div>
+
+  <div id="panel-depreciacion" class="panel card-body">
+    <div id="dep-contenido"></div>
+    <p class="note" style="margin-top:10px;">Depreciación calculada por método Ross-Heidecke adaptado al mercado NL. Considera edad, uso y estado de conservación.</p>
+  </div>
+
+  <div id="panel-alertas" class="panel card-body">
+    <div id="lista-alertas"></div>
+    <p class="note" style="margin-top:10px;">Valuación paramétrica orientativa. No sustituye avalúo formal ante notario o institución financiera.</p>
+  </div>
+
+  <div id="panel-admin" class="panel card-body">
+    <div class="admin-title">Costo de reposición nuevo por tipo ($/m² construcción)</div>
+    <table class="admin-table">
+      <thead><tr><th>Tipo de propiedad</th><th>$/m² nuevo</th></tr></thead>
+      <tbody id="admin-tipos"></tbody>
+    </table>
+    <div class="admin-title">Valor de terreno por municipio ($/m²)</div>
+    <table class="admin-table">
+      <thead><tr><th>Municipio</th><th>$/m² terreno</th></tr></thead>
+      <tbody id="admin-munis"></tbody>
+    </table>
+    <div class="admin-title">Multiplicador de acabados</div>
+    <table class="admin-table">
+      <thead><tr><th>Nivel</th><th>Factor</th></tr></thead>
+      <tbody id="admin-acabados"></tbody>
+    </table>
+    <div class="btn-actions">
+      <button class="btn-save" onclick="guardarAdmin()">Guardar cambios</button>
+      <span class="save-badge" id="save-badge">✓ Guardado</span>
+      <button class="btn-reset" onclick="resetAdmin()">Restaurar originales</button>
     </div>
   </div>
 </div>
 
-<div id="screen-cliente" style="display:none;">
-  <header class="app-header"><div class="header-inner"><div class="avatar">AC</div><div><div class="header-name">Seguimiento de su obra</div><div class="header-sub">Arq. Alvaro Chapa · 81 2289 4100</div></div><div class="header-badge" id="btn-salir-cli">Salir</div></div></header>
-  <div class="main"><div id="cli-contenido"><div class="loading">Cargando...</div></div></div>
+<button class="btn-pdf" onclick="exportarPDF()">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="white" stroke-width="1.2" fill="none"/><path d="M10 2v4h4M5 9h6M5 11.5h4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+  Exportar reporte PDF
+</button>
+
+<div class="app-footer">
+  Valuador Paramétrico de Propiedades · AMM Nuevo León 2025<br>
+  Arq. Alvaro Chapa Villarreal · 81 2289 4100 · Precios MXN sin IVA
 </div>
+
+</main>
 
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyAdOBRbIMan74KL_-kKjwL6fHEaNhZFrqg",
-  authDomain:"seguimiento-de-obra-chapa.firebaseapp.com",
-  projectId:"seguimiento-de-obra-chapa",
-  storageBucket:"seguimiento-de-obra-chapa.firebasestorage.app",
-  messagingSenderId:"130596217320",
-  appId:"1:130596217320:web:d58c6d35f17b9434f1445d"
-});
+const DESPACHO = "Arq. Alvaro Chapa Villarreal";
+const TELEFONO = "81 2289 4100";
 
-var auth=firebase.auth(),db=firebase.firestore(),storage=firebase.storage();
-var ETAPAS=["Cimentacion y estructura","Albanileria y muros","Instalaciones","Acabados interiores","Fachada y exteriores","Limpieza y entrega"];
-var COLS={"Cimentacion y estructura":"#378ADD","Albanileria y muros":"#1D9E75","Instalaciones":"#7F77DD","Acabados interiores":"#EF9F27","Fachada y exteriores":"#D85A30","Limpieza y entrega":"#2A7A4B"};
-var ALERT_COLS={warn:"#BA7517",ok:"#2A7A4B",danger:"#A32D2D",info:"#2E5599"};
-var proyectoActivo=null,unsubBit=null,unsubAlt=null;
-
-function fmt(ts){if(!ts)return"-";var d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString("es-MX",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
-function avgEtapas(etapas){var v=Object.values(etapas||{});return v.length?Math.round(v.reduce(function(s,x){return s+x;},0)/v.length):0;}
-function showScreen(s){["login","residente","cliente"].forEach(function(id){document.getElementById("screen-"+id).style.display="none";});document.getElementById("screen-"+s).style.display="block";}
-
-auth.onAuthStateChanged(function(user){
-  if(!user){showScreen("login");return;}
-  db.collection("usuarios").doc(user.uid).get().then(function(snap){
-    if(!snap.exists){
-      showScreen("residente");
-      cargarProyectos();
-      return;
-    }
-    var d=snap.data();
-    if(d.role==="residente"||d.role==="admin"){showScreen("residente");cargarProyectos();}
-    else if(d.role==="cliente"){showScreen("cliente");cargarCliente(d.proyectoId);}
-    else{showScreen("residente");cargarProyectos();}
-  }).catch(function(e){
-    console.error("FIRESTORE ERROR:", e);
-    showScreen("residente");
-    cargarProyectos();
-  });
-});
-
-document.getElementById("btn-login").onclick=function(){
-  var email=document.getElementById("login-email").value.trim();
-  var pass=document.getElementById("login-pass").value;
-  var err=document.getElementById("login-error");
-  err.style.display="none";
-  auth.signInWithEmailAndPassword(email,pass).catch(function(e){
-    err.textContent="Correo o contrasena incorrectos.";err.style.display="block";
-    console.error(e);
-  });
+const DEFAULTS = {
+  tipos: [
+    {key:"casa_sola", label:"Casa sola",              xm2:14500},
+    {key:"depto",     label:"Departamento",            xm2:13800},
+    {key:"oficina",   label:"Oficina / consultorio",   xm2:15500},
+    {key:"local",     label:"Local comercial",         xm2:13000},
+    {key:"bodega",    label:"Bodega / nave",            xm2:8500},
+    {key:"edificio",  label:"Edificio habitacional",   xm2:13200},
+    {key:"plaza",     label:"Local en plaza",           xm2:14000},
+  ],
+  munis: [
+    {key:"sanpedro",      label:"San Pedro Garza García",   terreno:9500},
+    {key:"monterrey_nte", label:"Monterrey Norte",           terreno:4200},
+    {key:"monterrey_ctr", label:"Monterrey Centro",          terreno:5800},
+    {key:"monterrey_sur", label:"Monterrey Sur",             terreno:6500},
+    {key:"sannicolas",    label:"San Nicolás de los Garza",  terreno:3800},
+    {key:"guadalupe",     label:"Guadalupe",                 terreno:3200},
+    {key:"escobedo",      label:"Escobedo / García",         terreno:2800},
+    {key:"apodaca",       label:"Apodaca",                   terreno:2600},
+    {key:"juarez",        label:"Juárez",                    terreno:2200},
+    {key:"santacatarina", label:"Santa Catarina",            terreno:2500},
+    {key:"cienega",       label:"Ciénega de Flores",         terreno:1800},
+    {key:"salinas",       label:"Salinas Victoria",          terreno:1600},
+    {key:"cadereyta",     label:"Cadereyta Jiménez",         terreno:1500},
+    {key:"allende",       label:"Allende",                   terreno:1400},
+    {key:"pesqueria",     label:"Pesquería",                 terreno:2100},
+  ],
+  acabados: [
+    {key:"economico", label:"Económicos", factor:0.75},
+    {key:"estandar",  label:"Estándar",   factor:1.00},
+    {key:"premium",   label:"Premium",    factor:1.30},
+    {key:"lujo",      label:"Lujo",       factor:1.65},
+  ],
+  // Depreciación por edad (% depreciado acumulado)
+  depEdad: [0.03, 0.10, 0.20, 0.32, 0.44, 0.55, 0.65],
+  // Ajuste por conservación (modifica la depreciación)
+  depConservacion: {excelente:-0.08, bueno:0, regular:0.08, malo:0.18, ruina:0.35},
+  // Cajones de estacionamiento (valor por cajón en MXN)
+  cajonValor: 85000,
 };
 
-document.getElementById("btn-salir").onclick=function(){auth.signOut();};
-document.getElementById("btn-salir-cli").onclick=function(){auth.signOut();};
+let CONFIG = JSON.parse(JSON.stringify(DEFAULTS));
 
-function cargarProyectos(){
-  db.collection("proyectos").orderBy("creado","desc").onSnapshot(function(snap){
-    var el=document.getElementById("res-proyectos");
-    if(snap.empty){el.innerHTML='<div class="empty">Sin proyectos aun.</div>';return;}
-    el.innerHTML=snap.docs.map(function(d){
-      var p=d.data(),id=d.id,a=avgEtapas(p.etapas);
-      return'<div class="proy-card" onclick="abrirProyecto(\''+id+'\')"><div style="display:flex;justify-content:space-between;"><div class="proy-nombre">'+(p.nombre||"Sin nombre")+'</div><span class="badge badge-en">En obra</span></div><div class="proy-meta">Cliente: '+(p.cliente||"-")+' - '+(p.tipo||"")+'</div><div class="prog-track"><div class="prog-fill" style="width:'+a+'%;"></div></div><div class="proy-footer"><span>'+(p.inicio||"")+' - '+(p.fin||"")+'</span><span>'+a+'% avance</span></div></div>';
-    }).join("");
-  });
-}
+function fmt(n){return "$"+Math.round(n).toLocaleString("es-MX");}
 
-document.getElementById("btn-nuevo-proy").onclick=function(){document.getElementById("res-lista").style.display="none";document.getElementById("res-form-nuevo").style.display="block";};
-document.getElementById("btn-cancel-nuevo").onclick=function(){document.getElementById("res-lista").style.display="block";document.getElementById("res-form-nuevo").style.display="none";};
+function getData(){
+  const tipoKey = document.getElementById("tipo").value;
+  const muniKey = document.getElementById("municipio").value;
+  const acabKey = document.getElementById("acabados").value;
+  const edadIdx = parseInt(document.getElementById("edad").value);
+  const consKey = document.getElementById("conservacion").value;
+  const zonaF   = parseFloat(document.getElementById("zona").value);
+  const niveles = parseInt(document.getElementById("niveles").value);
+  const cajones = parseInt(document.getElementById("cajones").value);
+  const supConst= parseFloat(document.getElementById("sup_const").value)||0;
+  const supTerr = parseFloat(document.getElementById("sup_terr").value)||0;
 
-document.getElementById("btn-crear-proy").onclick=function(){
-  var nombre=document.getElementById("np-nombre").value.trim();
-  var cliente=document.getElementById("np-cliente").value.trim();
-  var email=document.getElementById("np-email").value.trim();
-  var pass=document.getElementById("np-pass").value.trim();
-  var inicio=document.getElementById("np-inicio").value.trim();
-  var fin=document.getElementById("np-fin").value.trim();
-  var tipo=document.getElementById("np-tipo").value;
-  var msg=document.getElementById("np-msg");
-  if(!nombre||!cliente||!email||!pass){alert("Completa todos los campos.");return;}
-  msg.textContent="Creando...";msg.style.display="block";
-  db.collection("proyectos").add({nombre:nombre,cliente:cliente,email:email,inicio:inicio,fin:fin,tipo:tipo,estado:"activo",etapas:{},creado:firebase.firestore.FieldValue.serverTimestamp()}).then(function(pRef){
-    return auth.createUserWithEmailAndPassword(email,pass).then(function(cred){
-      return db.collection("usuarios").doc(cred.user.uid).set({role:"cliente",proyectoId:pRef.id,nombre:cliente,email:email});
-    }).then(function(){
-      msg.textContent="Proyecto creado. Cliente: "+email+" / Contrasena: "+pass;
-      setTimeout(function(){document.getElementById("btn-cancel-nuevo").click();},5000);
-    });
-  }).catch(function(e){msg.textContent="Error: "+e.message;console.error(e);});
-};
+  const tipoObj = CONFIG.tipos.find(t=>t.key===tipoKey)||CONFIG.tipos[0];
+  const muniObj = CONFIG.munis.find(m=>m.key===muniKey)||CONFIG.munis[0];
+  const acabObj = CONFIG.acabados.find(a=>a.key===acabKey)||CONFIG.acabados[1];
 
-window.abrirProyecto=function(id){
-  db.collection("proyectos").doc(id).get().then(function(snap){
-    if(!snap.exists)return;
-    proyectoActivo=Object.assign({id:id},snap.data());
-    document.getElementById("res-det-nombre").textContent=proyectoActivo.nombre;
-    document.getElementById("res-lista").style.display="none";
-    document.getElementById("res-detalle").style.display="block";
-    renderEtapas();escucharBit();escucharAlt();
-  });
-};
+  // Depreciación base por edad + ajuste conservación
+  let depBase = CONFIG.depEdad[edadIdx]||0;
+  let depAdj  = CONFIG.depConservacion[consKey]||0;
+  let depTotal = Math.min(Math.max(depBase + depAdj, 0), 0.90);
 
-document.getElementById("btn-volver").onclick=function(){
-  if(unsubBit)unsubBit();if(unsubAlt)unsubAlt();
-  proyectoActivo=null;
-  document.getElementById("res-detalle").style.display="none";
-  document.getElementById("res-lista").style.display="block";
-};
+  // Costo reposición nuevo
+  const nivelFactor = 1 + (niveles-1)*0.06;
+  const xm2Nuevo    = Math.round(tipoObj.xm2 * acabObj.factor * nivelFactor);
+  const valorNuevo  = xm2Nuevo * supConst;
 
-document.querySelectorAll(".tab[data-tab]").forEach(function(tab){
-  tab.onclick=function(){
-    var id=this.dataset.tab;
-    this.closest(".card").querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
-    this.classList.add("active");
-    this.closest(".card").querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});
-    document.getElementById("res-tab-"+id).classList.add("active");
+  // Valor construcción depreciada
+  const valorConst  = Math.round(valorNuevo * (1 - depTotal));
+
+  // Valor terreno
+  const xm2Terreno  = Math.round(muniObj.terreno * zonaF);
+  const valorTerr   = xm2Terreno * supTerr;
+
+  // Cajones
+  const valorCajones = cajones * CONFIG.cajonValor;
+
+  // Total
+  const total = valorConst + valorTerr + valorCajones;
+  const xm2Total = supConst > 0 ? Math.round(total / supConst) : 0;
+
+  return{
+    tipoObj, muniObj, acabObj, edadIdx, consKey, zonaF, niveles, cajones,
+    supConst, supTerr, depBase, depAdj, depTotal, xm2Nuevo, valorNuevo,
+    valorConst, xm2Terreno, valorTerr, valorCajones, total, xm2Total
   };
-});
-
-function renderEtapas(){
-  if(!proyectoActivo)return;
-  var etapas=proyectoActivo.etapas||{};
-  document.getElementById("res-avance-pct").textContent=avgEtapas(etapas)+"%";
-  document.getElementById("res-etapas").innerHTML=ETAPAS.map(function(e){
-    var pct=etapas[e]||0,col=COLS[e]||"#888";
-    return'<div class="etapa-row"><div class="etapa-top"><span class="etapa-name">'+e+'</span><span class="etapa-pct" style="color:'+col+';">'+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%;background:'+col+';"></div></div></div>';
-  }).join("");
 }
 
-document.getElementById("rep-pct").oninput=function(){document.getElementById("rep-pct-val").textContent=this.value+"%";};
-document.getElementById("rep-foto").onchange=function(){var p=document.getElementById("rep-foto-prev");if(this.files&&this.files[0]){p.src=URL.createObjectURL(this.files[0]);p.style.display="block";}};
+const EDAD_LABELS = ["0–5 años","6–10 años","11–20 años","21–30 años","31–40 años","41–50 años","Más de 50 años"];
+const CONS_LABELS = {excelente:"Excelente",bueno:"Bueno",regular:"Regular",malo:"Malo",ruina:"En ruina"};
 
-document.getElementById("rep-foto").onchange=function(){var p=document.getElementById("rep-foto-prev");if(this.files&&this.files[0]){p.src=URL.createObjectURL(this.files[0]);p.style.display="block";}};
+function calc(){
+  const d = getData();
+  const lo = d.total * 0.88;
+  const hi = d.total * 1.15;
 
-document.getElementById("btn-pub-reporte").onclick=function(){
-  if(!proyectoActivo)return;
-  var etapa=document.getElementById("rep-etapa").value;
-  var pct=parseInt(document.getElementById("rep-pct").value);
-  var nota=document.getElementById("rep-nota").value.trim();
-  var estado=document.getElementById("rep-estado").value;
-  var msg=document.getElementById("rep-msg");
-  if(!nota){alert("Escribe una nota.");return;}
-  msg.textContent="Guardando...";msg.style.display="block";msg.style.color="var(--text2)";
-  var fi=document.getElementById("rep-foto");
-  var guardar=function(fotoURL){
-    db.collection("proyectos").doc(proyectoActivo.id).collection("bitacora").add({etapa:etapa,pct:pct,nota:nota,estado:estado,fotoURL:fotoURL||null,fecha:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
-      var etapas=Object.assign({},proyectoActivo.etapas||{});etapas[etapa]=pct;
-      return db.collection("proyectos").doc(proyectoActivo.id).set({etapas:etapas,ultimoReporte:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).then(function(){
-        proyectoActivo.etapas=etapas;renderEtapas();
-        msg.textContent="Publicado";msg.style.color="var(--success)";
-        document.getElementById("rep-nota").value="";
-        document.getElementById("rep-foto-prev").style.display="none";
-        setTimeout(function(){msg.style.display="none";},3000);
-      });
-    }).catch(function(e){msg.textContent="Error: "+e.message;console.error(e);});
-  };
-  if(fi&&fi.files&&fi.files[0]){
-    var r=storage.ref("proyectos/"+proyectoActivo.id+"/"+Date.now()+"_"+fi.files[0].name);
-    r.put(fi.files[0]).then(function(){return r.getDownloadURL();}).then(function(url){guardar(url);}).catch(function(){guardar(null);});
-  } else {guardar(null);}
-};
+  document.getElementById("r-const").textContent = fmt(d.valorConst);
+  document.getElementById("r-terr").textContent  = fmt(d.valorTerr);
+  document.getElementById("r-dep").textContent   = Math.round(d.depTotal*100)+"%";
+  document.getElementById("r-xm2").textContent   = fmt(d.xm2Total)+"/m²";
+  document.getElementById("r-total").textContent = fmt(d.total);
+  document.getElementById("r-lo").textContent    = fmt(lo);
+  document.getElementById("r-hi").textContent    = fmt(hi);
+  document.getElementById("rneedle").style.left  = "50%";
+  document.getElementById("r-nota").textContent  =
+    d.tipoObj.label+" en "+d.muniObj.label+" · "+d.supConst+"m² construidos + "+d.supTerr+"m² terreno · "+
+    "Depreciación: "+Math.round(d.depTotal*100)+"% · Rango: "+fmt(lo)+" – "+fmt(hi)+
+    ". Precios MXN sin IVA. No sustituye avalúo formal.";
 
-function escucharBit(){
-  if(unsubBit)unsubBit();
-  unsubBit=db.collection("proyectos").doc(proyectoActivo.id).collection("bitacora").orderBy("fecha","desc").onSnapshot(function(snap){
-    var el=document.getElementById("res-bitacora");
-    if(snap.empty){el.innerHTML='<div class="empty">Sin reportes aun.</div>';return;}
-    var first=snap.docs[0].data();if(first.fecha)document.getElementById("res-ultimo").textContent=fmt(first.fecha);
-    el.innerHTML=snap.docs.map(function(d){var b=d.data();return'<div class="bit-item"><div class="bit-top"><span class="bit-badge">'+b.etapa+'</span><span class="bit-fecha">'+fmt(b.fecha)+'</span></div><div class="bit-texto">'+b.nota+'</div><span style="font-size:12px;font-weight:600;color:'+(COLS[b.etapa]||"#888")+';">'+b.pct+'%</span>'+(b.fotoURL?'<img src="'+b.fotoURL+'" class="bit-img" alt="foto">':'')+'</div>';}).join("");
-  });
+  // Desglose
+  const dl = document.getElementById("lista-desglose");
+  dl.innerHTML = `
+    <div class="desglose-row"><div><div class="desglose-lbl">Costo reposición nuevo</div><div class="desglose-sub">${fmt(d.xm2Nuevo)}/m² × ${d.supConst}m²</div></div><div class="desglose-val">${fmt(d.valorNuevo)}</div></div>
+    <div class="desglose-row"><div><div class="desglose-lbl">Depreciación aplicada</div><div class="desglose-sub">–${Math.round(d.depTotal*100)}% por edad y conservación</div></div><div class="desglose-val" style="color:var(--danger);">–${fmt(d.valorNuevo*d.depTotal)}</div></div>
+    <div class="desglose-row"><div><div class="desglose-lbl">Valor construcción neto</div><div class="desglose-sub">Construcción depreciada</div></div><div class="desglose-val">${fmt(d.valorConst)}</div></div>
+    <div class="desglose-row"><div><div class="desglose-lbl">Valor del terreno</div><div class="desglose-sub">${fmt(d.xm2Terreno)}/m² × ${d.supTerr}m²</div></div><div class="desglose-val">${fmt(d.valorTerr)}</div></div>
+    ${d.cajones>0?`<div class="desglose-row"><div><div class="desglose-lbl">Cajones de estacionamiento</div><div class="desglose-sub">${d.cajones} cajón${d.cajones>1?"es":""} × ${fmt(CONFIG.cajonValor)}</div></div><div class="desglose-val">${fmt(d.valorCajones)}</div></div>`:""}
+    <div class="desglose-row" style="border-top:2px solid var(--border2);margin-top:4px;padding-top:10px;"><div><div class="desglose-lbl" style="font-weight:600;color:var(--accent);">Total estimado</div></div><div class="desglose-val" style="font-size:15px;color:var(--accent);">${fmt(d.total)}</div></div>
+  `;
+
+  // Depreciación detalle
+  const depPct = Math.round(d.depTotal*100);
+  const depColor = depPct<20?"#2A7A4B":depPct<45?"#EF9F27":"#E24B4A";
+  document.getElementById("dep-contenido").innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px;">
+      <span>Depreciación total aplicada</span>
+      <span style="font-weight:600;color:${depColor};">${depPct}%</span>
+    </div>
+    <div class="dep-bar"><div class="dep-track"><div class="dep-fill" style="width:${depPct}%;background:${depColor};"></div></div></div>
+    <div class="desglose-row"><div class="desglose-lbl">Edad de la construcción</div><span class="badge badge-neu">${EDAD_LABELS[d.edadIdx]}</span></div>
+    <div class="desglose-row"><div class="desglose-lbl">Depreciación por edad</div><span class="badge badge-warn">–${Math.round(d.depBase*100)}%</span></div>
+    <div class="desglose-row"><div class="desglose-lbl">Estado de conservación</div><span class="badge ${d.consKey==='excelente'?'badge-pos':d.consKey==='ruina'?'badge-neg':'badge-warn'}">${CONS_LABELS[d.consKey]}</span></div>
+    <div class="desglose-row"><div class="desglose-lbl">Ajuste por conservación</div><span class="badge ${d.depAdj<=0?'badge-pos':'badge-neg'}">${d.depAdj>=0?"+":""}${Math.round(d.depAdj*100)}%</span></div>
+    <div class="desglose-row"><div class="desglose-lbl">Valor nuevo (sin depreciar)</div><div class="desglose-val">${fmt(d.valorNuevo)}</div></div>
+    <div class="desglose-row"><div class="desglose-lbl">Valor depreciado resultante</div><div class="desglose-val">${fmt(d.valorConst)}</div></div>
+  `;
+
+  // Alertas
+  const alertas = [];
+  if(d.depTotal>=0.50) alertas.push({c:"#E24B4A",t:"Depreciación alta ("+depPct+"%) — considerar remodelación para mejorar valor de mercado"});
+  if(d.consKey==="malo"||d.consKey==="ruina") alertas.push({c:"#E24B4A",t:"Estado crítico — impacta significativamente la comercialización y financiamiento"});
+  if(d.supTerr===0) alertas.push({c:"#EF9F27",t:"Sin superficie de terreno — verifica si aplica (dpto., local en plaza)"});
+  if(d.supConst>d.supTerr*3 && d.supTerr>0) alertas.push({c:"#EF9F27",t:"Alta relación construido/terreno — verificar coeficiente de utilización"});
+  if(d.cajones===0 && (d.tipoObj.key==="casa_sola"||d.tipoObj.key==="oficina")) alertas.push({c:"#EF9F27",t:"Sin estacionamiento — reduce el valor de mercado en este tipo de propiedad"});
+  if(d.edadIdx>=5) alertas.push({c:"#EF9F27",t:"Construcción mayor a 40 años — verificar instalaciones, estructura y cumplimiento normativo"});
+  if(d.consKey==="excelente"&&d.edadIdx<=1) alertas.push({c:"#2A7A4B",t:"Propiedad en excelente estado y reciente — perfil de comercialización óptimo"});
+  if(d.zonaF>=1.15) alertas.push({c:"#2A7A4B",t:"Zona premium del municipio — mayor plusvalía y liquidez"});
+  if(d.muniObj.key==="sanpedro") alertas.push({c:"#2A7A4B",t:"San Pedro Garza García — mercado con alta demanda y plusvalía sostenida"});
+  if(!alertas.length) alertas.push({c:"#2A7A4B",t:"Sin alertas significativas — propiedad con buen perfil de valuación"});
+  document.getElementById("lista-alertas").innerHTML = alertas.map(a=>
+    `<div class="risk-row"><div class="risk-dot" style="background:${a.c};"></div><span>${a.t}</span></div>`
+  ).join("");
 }
 
-function escucharAlt(){
-  if(unsubAlt)unsubAlt();
-  unsubAlt=db.collection("proyectos").doc(proyectoActivo.id).collection("alertas").orderBy("fecha","desc").onSnapshot(function(snap){
-    var el=document.getElementById("res-alertas");
-    if(snap.empty){el.innerHTML='<div class="empty">Sin alertas.</div>';return;}
-    el.innerHTML=snap.docs.map(function(d){var a=d.data();return'<div class="alerta-item"><div class="alerta-dot" style="background:'+(ALERT_COLS[a.tipo]||"#888")+';"></div><div><div>'+a.texto+'</div><div style="font-size:10px;color:var(--text3);margin-top:2px;">'+fmt(a.fecha)+'</div></div></div>';}).join("");
-  });
+function showTab(id,el){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("panel-"+id).classList.add("active");
+  el.classList.add("active");
+  if(id==="admin") buildAdmin();
 }
 
-document.getElementById("btn-add-alerta").onclick=function(){
-  if(!proyectoActivo)return;
-  var texto=document.getElementById("alerta-texto").value.trim();
-  var tipo=document.getElementById("alerta-tipo").value;
-  if(!texto)return;
-  db.collection("proyectos").doc(proyectoActivo.id).collection("alertas").add({texto:texto,tipo:tipo,fecha:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){document.getElementById("alerta-texto").value="";});
-};
-
-function cargarCliente(proyectoId){
-  db.collection("proyectos").doc(proyectoId).get().then(function(snap){
-    if(!snap.exists){document.getElementById("cli-contenido").innerHTML='<div class="empty">Proyecto no encontrado.</div>';return;}
-    var p=snap.data(),a=avgEtapas(p.etapas||{});
-    document.getElementById("cli-contenido").innerHTML='<div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;"><div><div style="font-size:15px;font-weight:600;">'+(p.nombre||"Mi obra")+'</div><div style="font-size:12px;color:var(--text2);margin-top:2px;">'+(p.tipo||"")+' - '+(p.inicio||"")+' a '+(p.fin||"")+'</div></div><span class="badge badge-en">En obra</span></div><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:5px;"><span>Avance general</span><span style="font-weight:600;">'+a+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+a+'%;"></div></div></div></div><div class="card"><div class="card-head">Avance por etapa</div><div class="card-body">'+ETAPAS.map(function(e){var pct=(p.etapas||{})[e]||0,col=COLS[e]||"#888";return'<div class="etapa-row"><div class="etapa-top"><span class="etapa-name">'+e+'</span><span class="etapa-pct" style="color:'+col+';">'+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%;background:'+col+';"></div></div></div>';}).join("")+'</div></div><div class="card"><div class="card-head">Bitacora</div><div class="card-body" id="cli-bit"><div class="loading">Cargando...</div></div></div><div class="card"><div class="card-head">Alertas</div><div class="card-body" id="cli-alt"><div class="loading">Cargando...</div></div></div><div class="app-footer">Seguimiento por Arq. Alvaro Chapa - 81 2289 4100</div>';
-    db.collection("proyectos").doc(proyectoId).collection("bitacora").orderBy("fecha","desc").onSnapshot(function(snap){var el=document.getElementById("cli-bit");if(!el)return;if(snap.empty){el.innerHTML='<div class="empty">Sin reportes aun.</div>';return;}el.innerHTML=snap.docs.map(function(d){var b=d.data();return'<div class="bit-item"><div class="bit-top"><span class="bit-badge">'+b.etapa+'</span><span class="bit-fecha">'+fmt(b.fecha)+'</span></div><div class="bit-texto">'+b.nota+'</div><span style="font-size:12px;font-weight:600;color:'+(COLS[b.etapa]||"#888")+';">'+b.pct+'%</span>'+(b.fotoURL?'<img src="'+b.fotoURL+'" class="bit-img" alt="foto">':'')+'</div>';}).join("");});
-    db.collection("proyectos").doc(proyectoId).collection("alertas").orderBy("fecha","desc").onSnapshot(function(snap){var el=document.getElementById("cli-alt");if(!el)return;if(snap.empty){el.innerHTML='<div class="empty">Sin alertas.</div>';return;}el.innerHTML=snap.docs.map(function(d){var a=d.data();return'<div class="alerta-item"><div class="alerta-dot" style="background:'+(ALERT_COLS[a.tipo]||"#888")+';"></div><div><div>'+a.texto+'</div><div style="font-size:10px;color:var(--text3);margin-top:2px;">'+fmt(a.fecha)+'</div></div></div>';}).join("");});
-  });
+function buildAdmin(){
+  const bt=document.getElementById("admin-tipos"); bt.innerHTML="";
+  CONFIG.tipos.forEach((t,i)=>{bt.innerHTML+=`<tr><td>${t.label}</td><td><input type="number" id="at_${i}" value="${t.xm2}" min="1000" max="100000" step="100"></td></tr>`;});
+  const bm=document.getElementById("admin-munis"); bm.innerHTML="";
+  CONFIG.munis.forEach((m,i)=>{bm.innerHTML+=`<tr><td>${m.label}</td><td><input type="number" id="am_${i}" value="${m.terreno}" min="100" max="100000" step="100"></td></tr>`;});
+  const ba=document.getElementById("admin-acabados"); ba.innerHTML="";
+  CONFIG.acabados.forEach((a,i)=>{ba.innerHTML+=`<tr><td>${a.label}</td><td><input type="number" id="aa_${i}" value="${a.factor}" min="0.5" max="3" step="0.01"></td></tr>`;});
 }
 
-// ── EXPORTAR PDF ─────────────────────────────────────────
-document.getElementById("btn-pdf-reporte").onclick=function(){
-  if(!proyectoActivo){alert("Abre un proyecto primero.");return;}
-  var jsPDF=window.jspdf.jsPDF;
-  var doc=new jsPDF({unit:"mm",format:"a4"});
-  var W=210,mg=18,cw=W-mg*2;
-  var fecha=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
+function guardarAdmin(){
+  CONFIG.tipos.forEach((_,i)=>{CONFIG.tipos[i].xm2=parseFloat(document.getElementById("at_"+i).value)||CONFIG.tipos[i].xm2;});
+  CONFIG.munis.forEach((_,i)=>{CONFIG.munis[i].terreno=parseFloat(document.getElementById("am_"+i).value)||CONFIG.munis[i].terreno;});
+  CONFIG.acabados.forEach((_,i)=>{CONFIG.acabados[i].factor=parseFloat(document.getElementById("aa_"+i).value)||CONFIG.acabados[i].factor;});
+  const b=document.getElementById("save-badge"); b.style.display="inline-block"; setTimeout(()=>b.style.display="none",2200);
+  calc();
+}
 
-  // Encabezado
-  doc.setFillColor(31,56,100);doc.rect(0,0,W,32,"F");
-  doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont("helvetica","bold");
-  doc.text("Reporte de Avance de Obra",mg,13);
-  doc.setFontSize(10);doc.setFont("helvetica","normal");
-  doc.text("Arq. Alvaro Chapa Villarreal",mg,20);
-  doc.text("WhatsApp: 81 2289 4100",mg,26);
+function resetAdmin(){
+  if(!confirm("¿Restaurar todos los valores originales?")) return;
+  CONFIG=JSON.parse(JSON.stringify(DEFAULTS)); buildAdmin(); calc();
+}
+
+function exportarPDF(){
+  const d = getData();
+  const fecha = new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:"mm",format:"a4"});
+  const W=210, mg=18, cw=W-mg*2;
+
+  doc.setFillColor(31,56,100); doc.rect(0,0,W,32,"F");
+  doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont("helvetica","bold");
+  doc.text("Valuación Paramétrica de Propiedad",mg,13);
+  doc.setFontSize(10); doc.setFont("helvetica","normal");
+  doc.text(DESPACHO,mg,20); doc.text("WhatsApp: "+TELEFONO,mg,26);
   doc.text("Fecha: "+fecha,W-mg,20,{align:"right"});
 
-  var y=40;
-  // Datos del proyecto
-  doc.setTextColor(80,80,80);doc.setFontSize(8);doc.setFont("helvetica","bold");
-  doc.text("PROYECTO",mg,y);doc.text("CLIENTE",mg+80,y);doc.text("TIPO",mg+140,y);
-  y+=5;doc.setFont("helvetica","normal");doc.setTextColor(30,30,30);
-  doc.text(proyectoActivo.nombre||"-",mg,y);
-  doc.text(proyectoActivo.cliente||"-",mg+80,y);
-  doc.text(proyectoActivo.tipo||"-",mg+140,y);
-  y+=4;doc.setTextColor(120,120,120);doc.setFontSize(7.5);
-  doc.text("Inicio: "+(proyectoActivo.inicio||"-")+" · Entrega estimada: "+(proyectoActivo.fin||"-"),mg,y);
+  let y=40;
+  doc.setTextColor(80,80,80); doc.setFontSize(8); doc.setFont("helvetica","bold");
+  doc.text("TIPO DE PROPIEDAD",mg,y); doc.text("MUNICIPIO",mg+60,y); doc.text("SUP. CONST.",mg+115,y); doc.text("SUP. TERRENO",mg+152,y);
+  y+=5; doc.setFont("helvetica","normal"); doc.setTextColor(30,30,30);
+  doc.text(d.tipoObj.label,mg,y); doc.text(d.muniObj.label,mg+60,y);
+  doc.text(d.supConst+"m²",mg+115,y); doc.text(d.supTerr+"m²",mg+152,y);
 
-  // Avance general
   y+=10;
-  var etapas=proyectoActivo.etapas||{};
-  var vals=Object.values(etapas);
-  var avance=vals.length?Math.round(vals.reduce(function(s,x){return s+x;},0)/vals.length):0;
-  doc.setFillColor(238,243,251);doc.roundedRect(mg,y,cw,16,3,3,"F");
-  doc.setTextColor(31,56,100);doc.setFontSize(8);doc.setFont("helvetica","bold");
-  doc.text("AVANCE GENERAL",mg+6,y+6);
-  doc.setFontSize(20);doc.text(avance+"%",mg+6,y+14);
-  y+=18;
+  doc.setFillColor(238,243,251); doc.roundedRect(mg,y,cw,28,3,3,"F");
+  doc.setTextColor(31,56,100); doc.setFontSize(9); doc.setFont("helvetica","bold");
+  doc.text("VALOR TOTAL ESTIMADO (MXN, SIN IVA)",mg+6,y+8);
+  doc.setFontSize(19); doc.text(fmt(d.total),mg+6,y+20);
+  doc.setFontSize(10); doc.setFont("helvetica","normal"); doc.setTextColor(80,80,80);
+  doc.text("Rango: "+fmt(d.total*0.88)+" – "+fmt(d.total*1.15),mg+cw-4,y+20,{align:"right"});
 
-  // Fechas debajo del recuadro
-  doc.setFontSize(6.5);doc.setFont("helvetica","normal");doc.setTextColor(150,150,150);
-  doc.text("Inicio: "+(proyectoActivo.inicio||"-")+"   Entrega: "+(proyectoActivo.fin||"-"),mg,y);
-  y+=8;
-
-  // Etapas
-  var ETAPAS_LIST=["Cimentacion y estructura","Albanileria y muros","Instalaciones","Acabados interiores","Fachada y exteriores","Limpieza y entrega"];
-  var COLS_PDF=["#378ADD","#1D9E75","#7F77DD","#EF9F27","#D85A30","#2A7A4B"];
-  doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(31,56,100);
-  doc.text("Avance por etapa",mg,y);y+=6;
-
-  ETAPAS_LIST.forEach(function(e,i){
-    var pct=etapas[e]||0;
-    var col=COLS_PDF[i]||"#888";
-    var rgb=hexToRgb(col);
-    doc.setFillColor(i%2===0?248:255,i%2===0?250:255,i%2===0?252:255);
-    doc.rect(mg,y,cw,8,"F");
-    doc.setTextColor(50,50,50);doc.setFontSize(8);doc.setFont("helvetica","normal");
-    doc.text(e,mg+3,y+5.5);
-    // Barra
-    doc.setFillColor(230,230,230);doc.rect(mg+100,y+2,60,4,"F");
-    if(pct>0){doc.setFillColor(rgb.r,rgb.g,rgb.b);doc.rect(mg+100,y+2,60*pct/100,4,"F");}
-    doc.setFont("helvetica","bold");doc.setTextColor(rgb.r,rgb.g,rgb.b);
-    doc.text(pct+"%",mg+163,y+5.5);
-    y+=8;
+  y+=34;
+  doc.setFillColor(31,56,100); doc.rect(mg,y,cw,7,"F");
+  doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont("helvetica","bold");
+  doc.text("Concepto",mg+3,y+5); doc.text("Valor",mg+130,y+5); doc.text("Detalle",mg+160,y+5);
+  y+=7;
+  const rows=[
+    ["Costo de reposición nuevo",fmt(d.valorNuevo),fmt(d.xm2Nuevo)+"/m²"],
+    ["Depreciación (–"+Math.round(d.depTotal*100)+"%)","-"+fmt(d.valorNuevo*d.depTotal),EDAD_LABELS[d.edadIdx]],
+    ["Valor construcción neto",fmt(d.valorConst),CONS_LABELS[d.consKey]],
+    ["Valor del terreno",fmt(d.valorTerr),fmt(d.xm2Terreno)+"/m²"],
+    d.cajones>0?["Cajones de estacionamiento",fmt(d.valorCajones),d.cajones+" cajón(es)"]:null,
+    ["TOTAL ESTIMADO",fmt(d.total),""],
+  ].filter(Boolean);
+  rows.forEach((r,i)=>{
+    const isTotal = r[0]==="TOTAL ESTIMADO";
+    doc.setFillColor(isTotal?238:i%2===0?248:255, isTotal?243:i%2===0?250:255, isTotal?251:255);
+    doc.rect(mg,y,cw,7,"F");
+    doc.setTextColor(isTotal?31:50,isTotal?56:50,isTotal?100:50);
+    doc.setFont("helvetica",isTotal?"bold":"normal");
+    doc.text(r[0],mg+3,y+5); doc.text(r[1],mg+130,y+5); doc.text(r[2]||"",mg+160,y+5);
+    y+=7;
   });
 
-  // Último reporte
+  y+=8;
+  doc.setFontSize(9); doc.setFont("helvetica","bold"); doc.setTextColor(31,56,100);
+  doc.text("Parámetros de valuación",mg,y); y+=6;
+  const params=[
+    ["Acabados",d.acabObj.label+" (×"+d.acabObj.factor.toFixed(2)+")"],
+    ["Zona dentro del municipio",d.zonaF>=1.15?"Zona alta":d.zonaF>=1?"Zona media":d.zonaF>=0.82?"Zona popular":"Interés social"],
+    ["Edad de la construcción",EDAD_LABELS[d.edadIdx]],
+    ["Estado de conservación",CONS_LABELS[d.consKey]],
+    ["Depreciación total aplicada",Math.round(d.depTotal*100)+"%"],
+    ["Niveles",d.niveles+" nivel(es)"],
+  ];
+  params.forEach((r,i)=>{
+    doc.setFillColor(i%2===0?248:255,i%2===0?250:255,i%2===0?248:255);
+    doc.rect(mg,y,cw,6,"F"); doc.setTextColor(50,50,50); doc.setFontSize(8); doc.setFont("helvetica","normal");
+    doc.text(r[0],mg+3,y+4.5); doc.text(r[1],mg+110,y+4.5); y+=6;
+  });
+
   y+=6;
-  db.collection("proyectos").doc(proyectoActivo.id).collection("bitacora")
-    .orderBy("fecha","desc").limit(1).get().then(function(snap){
-      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(31,56,100);
-      doc.text("Ultimo reporte",mg,y);y+=6;
-
-      if(!snap.empty){
-        var b=snap.docs[0].data();
-        var fechaRep=b.fecha?b.fecha.toDate().toLocaleDateString("es-MX",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"-";
-        doc.setFillColor(245,248,245);doc.roundedRect(mg,y,cw,28,2,2,"F");
-        doc.setTextColor(50,50,50);doc.setFontSize(8);doc.setFont("helvetica","bold");
-        doc.text(b.etapa||"-",mg+4,y+6);
-        doc.setFont("helvetica","normal");doc.setTextColor(80,80,80);
-        doc.text(fechaRep,mg+cw-4,y+6,{align:"right"});
-        doc.setTextColor(30,30,30);
-        var notaLines=doc.splitTextToSize(b.nota||"",cw-8);
-        doc.text(notaLines,mg+4,y+13);
-        var estadoLabel=b.estado==="tiempo"?"En tiempo":b.estado==="adelanto"?"Adelantado":b.estado==="retraso_menor"?"Retraso menor":"Retraso";
-        doc.setFont("helvetica","bold");doc.setTextColor(42,122,75);
-        doc.text(estadoLabel,mg+4,y+24);
-        doc.setFont("helvetica","bold");doc.setTextColor(31,56,100);
-        doc.text((b.pct||0)+"%",mg+cw-4,y+24,{align:"right"});
-        y+=34;
-
-        // Foto si existe — via canvas para evitar CORS
-        if(b.fotoURL){
-          var img=new Image();
-          img.crossOrigin="anonymous";
-          img.onload=function(){
-            try{
-              var canvas=document.createElement("canvas");
-              canvas.width=img.width;canvas.height=img.height;
-              var ctx=canvas.getContext("2d");
-              ctx.drawImage(img,0,0);
-              var dataURL=canvas.toDataURL("image/jpeg",0.85);
-              var maxW=cw,maxH=75;
-              var ratio=Math.min(maxW/img.width,maxH/img.height);
-              var iw=img.width*ratio,ih=img.height*ratio;
-              // Titulo foto
-              doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(31,56,100);
-              doc.text("Foto de avance",mg,y);y+=5;
-              doc.addImage(dataURL,"JPEG",mg,y,iw,ih);
-              y+=ih+6;
-            }catch(e){
-              doc.setFontSize(8);doc.setTextColor(150,150,150);
-              doc.text("[Foto no disponible para PDF]",mg,y);y+=8;
-            }
-            agregarPie(doc,W,mg);
-            doc.save("reporte_"+fecha.replace(/ /g,"_")+".pdf");
-          };
-          img.onerror=function(){
-            // Intentar sin crossOrigin
-            var img2=new Image();
-            img2.onload=function(){
-              try{
-                var canvas=document.createElement("canvas");
-                canvas.width=img2.width;canvas.height=img2.height;
-                var ctx=canvas.getContext("2d");
-                ctx.drawImage(img2,0,0);
-                var dataURL=canvas.toDataURL("image/jpeg",0.85);
-                var maxW=cw,maxH=75;
-                var ratio=Math.min(maxW/img2.width,maxH/img2.height);
-                var iw=img2.width*ratio,ih=img2.height*ratio;
-                doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(31,56,100);
-                doc.text("Foto de avance",mg,y);y+=5;
-                doc.addImage(dataURL,"JPEG",mg,y,iw,ih);
-                y+=ih+6;
-              }catch(e2){
-                doc.setFontSize(8);doc.setTextColor(150,150,150);
-                doc.text("[Foto disponible en la app]",mg,y);y+=8;
-              }
-              agregarPie(doc,W,mg);
-              doc.save("reporte_"+fecha.replace(/ /g,"_")+".pdf");
-            };
-            img2.onerror=function(){
-              agregarPie(doc,W,mg);
-              doc.save("reporte_"+fecha.replace(/ /g,"_")+".pdf");
-            };
-            img2.src=b.fotoURL;
-          };
-          img.src=b.fotoURL;
-        } else {
-          agregarPie(doc,W,mg);
-          doc.save("reporte_"+fecha.replace(/ /g,"_")+".pdf");
-        }
-      } else {
-        doc.setTextColor(150,150,150);doc.setFontSize(8);
-        doc.text("Sin reportes registrados aun.",mg,y);
-        agregarPie(doc,W,mg);
-        doc.save("reporte_"+fecha.replace(/ /g,"_")+".pdf");
-      }
-    });
-};
-
-function agregarPie(doc,W,mg){
-  doc.setDrawColor(200,200,200);doc.line(mg,285,W-mg,285);
-  doc.setFontSize(7.5);doc.setTextColor(160,160,160);doc.setFont("helvetica","normal");
-  doc.text("Arq. Alvaro Chapa Villarreal · 81 2289 4100 · Seguimiento de obra NL 2025",mg,289);
-  doc.text("Pagina 1",W-mg,289,{align:"right"});
+  doc.setFontSize(7.5); doc.setTextColor(140,140,140); doc.setFont("helvetica","italic");
+  const nota="Valuación paramétrica elaborada por "+DESPACHO+" · WhatsApp "+TELEFONO+". Método: costo de reposición depreciado + valor de terreno. Precios MXN sin IVA. Estimado orientativo basado en mercado AMM NL 2025. No sustituye avalúo formal ante notario o institución financiera.";
+  doc.text(doc.splitTextToSize(nota,cw),mg,y);
+  doc.setDrawColor(210,210,210); doc.line(mg,285,W-mg,285);
+  doc.setFontSize(7.5); doc.setTextColor(160,160,160); doc.setFont("helvetica","normal");
+  doc.text(DESPACHO+" · Valuador AMM NL 2025",mg,289); doc.text("Página 1",W-mg,289,{align:"right"});
+  doc.save("valuacion_propiedad_"+new Date().toISOString().slice(0,10)+".pdf");
 }
 
-function hexToRgb(hex){
-  var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return{r:r,g:g,b:b};
-}
+document.querySelectorAll("select,input[type=number]").forEach(el=>{
+  el.addEventListener("change",calc);
+  el.addEventListener("input",calc);
+});
+calc();
 </script>
 </body>
 </html>
