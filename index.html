@@ -102,7 +102,7 @@ select:focus,input[type=number]:focus{border-color:var(--accent3);}
 <main class="main">
 
 <div class="card">
-  <div class="card-head">Valuador paramétrico de propiedades existentes — AMM NL</div>
+  <div class="card-head">Valuador paramétrico de propiedades existentes · México 2026</div>
   <div class="card-body">
 
     <div class="row2">
@@ -299,7 +299,7 @@ select:focus,input[type=number]:focus{border-color:var(--accent3);}
 </button>
 
 <div class="app-footer">
-  Valuador Paramétrico de Propiedades · AMM Nuevo León 2025<br>
+  Valuador Paramétrico de Propiedades · AMM México 2026<br>
   Arq. Alvaro Chapa Villarreal · 81 2289 4100 · Precios MXN sin IVA
 </div>
 
@@ -568,11 +568,11 @@ function exportarPDF(){
 
   y+=6;
   doc.setFontSize(7.5); doc.setTextColor(140,140,140); doc.setFont("helvetica","italic");
-  const nota="Valuación paramétrica elaborada por "+DESPACHO+" · WhatsApp "+TELEFONO+". Método: costo de reposición depreciado + valor de terreno. Precios MXN sin IVA. Estimado orientativo basado en mercado AMM NL 2025. No sustituye avalúo formal ante notario o institución financiera.";
+  const nota="Valuación paramétrica elaborada por "+DESPACHO+" · WhatsApp "+TELEFONO+". Método: costo de reposición depreciado + valor de terreno. Precios MXN sin IVA. Estimado orientativo basado en mercado AMM México 2026. No sustituye avalúo formal ante notario o institución financiera.";
   doc.text(doc.splitTextToSize(nota,cw),mg,y);
   doc.setDrawColor(210,210,210); doc.line(mg,285,W-mg,285);
   doc.setFontSize(7.5); doc.setTextColor(160,160,160); doc.setFont("helvetica","normal");
-  doc.text(DESPACHO+" · Valuador AMM NL 2025",mg,289); doc.text("Página 1",W-mg,289,{align:"right"});
+  doc.text(DESPACHO+" · Valuador AMM México 2026",mg,289); doc.text("Página 1",W-mg,289,{align:"right"});
   doc.save("valuacion_propiedad_"+new Date().toISOString().slice(0,10)+".pdf");
 }
 
